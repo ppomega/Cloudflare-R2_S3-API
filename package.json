@@ -1,14 +1,14 @@
 {
-  "name": "test",
+  "name": "cloudflare-r2-s3",
   "version": "1.0.0",
-  "description": "",
-  "main": "test.js",
+  "description": "This is module is designed to interact with the Cloudflare R2 Object Storage which uses the R2-S3 API underhood",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --open",
     "build": "webpack"
   },
-  "author": "",
+  "author": "Prateek Veerbhan",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
