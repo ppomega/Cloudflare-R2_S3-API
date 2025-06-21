@@ -1,18 +1,34 @@
-const dotenv = require("dotenv");
-const UploadData = require("./src/Upload-Data/main.js");
-dotenv.config();
-
-const a = new UploadData(
-  "thunder-streams",
-  process.env.CLOUDFLARE_R2_ACCESSKEY,
-  process.env.CLOUDFLARE_R2_SECRETKEY,
-  process.env.CLOUDFLARE_R2_HOST,
-  process.env.CLOUDFLARE_R2_ACCOUNT_ID
-);
-a.largeUpload("D:/Games/fg-01.bin", "a.bin")
-  .then((res) => {
-    console.log(res);
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+const GetObject = require("./GetObject");
+const UploadData = require("./uploadRequest");
+const DeleteObject = require("./DeleteObject");
+class CloudflareR2 {
+  constructor({ accessKeyId, secretAccessKey, bucket, accountId, host }) {
+    this.bucket = bucket;
+    this.accountId = accountId;
+    this.host = host;
+    this.accessKeyId = accessKeyId;
+    this.secretAccessKey = secretAccessKey;
+    this.GetObject = new GetObject(
+      this.bucket,
+      this.accessKeyId,
+      this.secretAccessKey,
+      this.host,
+      this.accountId
+    );
+    this.UploadData = new UploadData(
+      this.bucket,
+      this.accessKeyId,
+      this.secretAccessKey,
+      this.host,
+      this.accountId
+    );
+    this.DeleteObject = new DeleteObject(
+      this.bucket,
+      this.accessKeyId,
+      this.secretAccessKey,
+      this.host,
+      this.accountId
+    );
+  }
+}
+module.exports = CloudflareR2;
