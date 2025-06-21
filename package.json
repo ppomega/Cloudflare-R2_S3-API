@@ -12,17 +12,12 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
-    "cors": "^2.8.5",
+    "base64url": "^3.0.1",
+    "crypto": "^1.0.1",
     "crypto-js": "^4.2.0",
-    "dashjs": "^4.7.4",
     "dotenv": "^16.5.0",
-    "express": "^4.21.1",
-    "fast-xml-parser": "^4.5.0",
-    "html-webpack-plugin": "^5.6.3",
-    "test": "file:",
-    "video.js": "^8.19.1",
-    "videojs-contrib-dash": "^5.1.1",
-    "videojs-contrib-quality-levels": "^4.1.0"
+    "fast-xml-parser": "^4.5.3",
+    "html-webpack-plugin": "^5.6.3"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

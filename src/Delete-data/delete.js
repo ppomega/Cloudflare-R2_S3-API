@@ -1,25 +1,28 @@
-const axios = require("axios");
 const crypto = require("crypto-js");
-async function Getobj(path) {
-  const accessKeyId = process.env.CLOUDFLARE_R2_ACCESSKEY;
-  const secretAccessKey = process.env.CLOUDFLARE_R2_SECRETKEY;
-  const region = "auto";
-  const service = "s3";
-  const host = process.env.CLOUDFLARE_R2_HOST; // Replace with your Cloudflare account ID
-  const method = "GET";
-  const currentDate = new Date();
-
-  const amzDate =
-    currentDate
-      .toISOString()
-      .replace(/[:-]|\.\d{3}/g, "")
-      .substr(0, 15) + "Z";
-  const dateStamp = amzDate.substr(0, 8);
-
-  const canonicalUri = `/thunder-streams/${path}\n`;
+const region = "auto";
+const service = "s3";
+const method = "DELETE";
+const currentDate = new Date();
+const amzDate =
+  currentDate
+    .toISOString()
+    .replace(/[:-]|\.\d{3}/g, "")
+    .substr(0, 15) + "Z";
+const dateStamp = amzDate.substr(0, 8);
+async function Delete(
+  bucket,
+  accessKeyId,
+  secretAccessKey,
+  host,
+  accountId,
+  filename
+) {
+  const canonicalUri = `/${bucket}/${filename}\n`;
   const canonicalHeaders = `host:${host}\nx-amz-content-sha256:UNSIGNED-PAYLOAD\nx-amz-date:${amzDate}\n`;
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
-  const canonicalRequest = `${method}\n${canonicalUri}\n${canonicalHeaders}\n${signedHeaders}\nUNSIGNED-PAYLOAD`;
+  const payloadHash = "UNSIGNED-PAYLOAD";
+  const canonicalRequest = `${method}\n${canonicalUri}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+  console.log(canonicalRequest);
   const algorithm = "AWS4-HMAC-SHA256";
   const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
   const stringToSign = `${algorithm}\n${amzDate}\n${credentialScope}\n${crypto
@@ -32,6 +35,7 @@ async function Getobj(path) {
     const kSigning = crypto.HmacSHA256("aws4_request", kService);
     return kSigning;
   }
+
   const signingKey = getSignatureKey(
     secretAccessKey,
     dateStamp,
@@ -41,27 +45,31 @@ async function Getobj(path) {
   const signature = crypto
     .HmacSHA256(stringToSign, signingKey)
     .toString(crypto.enc.Hex);
-
   const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+  const axios = require("axios");
+
   let config = {
-    method: "GET",
-    url: `${process.env.CLOUDFLARE_R2_ACCOUNT_ID}/thunder-streams/${path}`,
+    method: "delete",
+    maxBodyLength: Infinity,
+    url: `${accountId}/${bucket}/${filename}`,
     headers: {
       Authorization: authorizationHeader,
+      "x-amz-date": amzDate,
       Host: host,
       "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-      "x-amz-date": amzDate,
+      "Content-Type": "application/json",
     },
-
-    responseType: "stream",
   };
-  try {
-    res = await axios.request(config);
-    console.log(typeof res.data);
-    return res;
-  } catch (e) {
-    return e;
-  }
-}
 
-module.exports = Getobj;
+  axios
+    .request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(canonicalRequest);
+      console.log(error);
+    });
+}
+module.exports = Delete;

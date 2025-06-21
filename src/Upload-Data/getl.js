@@ -1,12 +1,9 @@
-const axios = require("axios");
 const crypto = require("crypto-js");
-const { response } = require("express");
-const fs = require("node:fs");
-const accessKeyId = process.env.CLOUDFLARE_R2_ACCESSKEY;
-const secretAccessKey = process.env.CLOUDFLARE_R2_SECRETKEY;
+const accessKeyId = "098dc721de4cf12306ea3e552220b12b";
+const secretAccessKey =
+  "d961af5a27c2918c5b6bad8bb1d09c0f522a8e66d37a20b4c3683f0f19a04c95";
 const region = "auto";
 const service = "s3";
-const host = process.env.CLOUDFLARE_R2_HOST; // Replace with your Cloudflare account ID
 const method = "GET";
 
 const currentDate = new Date();
@@ -16,13 +13,13 @@ const amzDate =
     .toISOString()
     .replace(/[:-]|\.\d{3}/g, "")
     .substr(0, 15) + "Z";
-const dateStamp = amzDate.substr(0, 8);
-
-const canonicalUri = "/thunder-streams/hhhh.mp4";
+const dateStamp = amzDate.substr(0, 8); // YYYYMMDD
+const canonicalUri = "/thunder-streams";
+const q = "uploads=";
 const canonicalHeaders = `host:${host}\nx-amz-content-sha256:UNSIGNED-PAYLOAD\nx-amz-date:${amzDate}\n`;
 const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
 const payloadHash = "UNSIGNED-PAYLOAD";
-const canonicalRequest = `${method}\n${canonicalUri}\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
+const canonicalRequest = `${method}\n${canonicalUri}\n${q}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
 const algorithm = "AWS4-HMAC-SHA256";
 const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
 const stringToSign = `${algorithm}\n${amzDate}\n${credentialScope}\n${crypto
@@ -35,30 +32,34 @@ function getSignatureKey(key, dateStamp, regionName, serviceName) {
   const kSigning = crypto.HmacSHA256("aws4_request", kService);
   return kSigning;
 }
+
 const signingKey = getSignatureKey(secretAccessKey, dateStamp, region, service);
 const signature = crypto
   .HmacSHA256(stringToSign, signingKey)
   .toString(crypto.enc.Hex);
 
 const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
-async function BucketList(start, end) {
-  let config = {
-    responseType: "stream",
-    method: "get",
-    url: `${process.env.CLOUDFLARE_R2_ACCOUNT_ID}/thunder-streams/hhhh.mp4`,
-    headers: {
-      Authorization: authorizationHeader,
-      "x-amz-date": amzDate,
-      "Content-Type": "text/plain",
 
-      Range: `bytes=${start}-${end}`,
-      Host: host,
-      "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-    },
-  };
-  const h = await axios.request(config);
+const axios = require("axios");
+const FormData = require("form-data");
+let data = new FormData();
 
-  return h.data;
+let config = {
+  method: "get",
+  maxBodyLength: Infinity,
+  url: `${process.env.CLOUDFLARE_R2_ACCOUNT_ID}/thunder-streams?uploads`,
+  headers: {
+    Authorization: authorizationHeader,
+    "x-amz-date": amzDate,
+    Host: host,
+    "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+    "Content-Type": "application/json",
+  },
+};
+async function Getl() {
+  var res = await axios.request(config);
+
+  return res.data;
 }
 
-module.exports = BucketList;
+module.exports = Getl;

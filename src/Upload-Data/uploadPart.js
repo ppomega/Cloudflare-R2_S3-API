@@ -1,30 +1,41 @@
 const axios = require("axios");
 const crypto = require("crypto-js");
-const fs = require("node:fs");
-const dotenv = require("dotenv");
-dotenv.config();
+const crypt = require("crypto");
 
-let data = fs.createReadStream("s.rar", {
-  start: 100000001,
-  end: 200000000,
-});
-const accessKeyId = process.env.CLOUDFLARE_R2_ACCESSKEY;
-const secretAccessKey = process.env.CLOUDFLARE_R2_SECRETKEY;
-const region = "auto";
-const service = "s3";
-const host = process.env.CLOUDFLARE_R2_HOST; // Replace with your Cloudflare account ID
-const method = "PUT";
-const uploadid =
-  "AIyTdVInsAibY-zyplMgqmG3TofHhrLOdIQdNCm_LMZlpKtydKQxsCAviCI8avJY0j-ds1gd1Cuh1Ooy6s9ghW5XKFq3S3s2bcPQSDZhx3O2oiSLzI7-YA_6X4ws7C3XY83T2wOdZTZcWK4nb3IoS3jy_-lbBqicW5ATmonZduFD6y_h1HyS4-W_BXaMWol7EcdoD8D-QuZMDApFnhZheGQEAaUe5M9_SvJMZfNyeSR0hV8GAo1AB6AivDMQkglbX3WOvGyY_XAKR_6OZGxe6OXg1hnki7muh_eN3xzgfTs48VxklXFyFXfSDd_RKQWT_RiN3PDli1iXZeGXXryrbuM";
-let da = [];
-var payloadHash = "";
-data.on("data", (chunk) => {
-  da.push(chunk);
-});
-data.on("end", async () => {
+const fs = require("node:fs");
+const { pipeline } = require("node:stream/promises");
+async function upload(
+  bucket,
+  accessKeyId,
+  secretAccessKey,
+  host,
+  accountId,
+  filePath,
+  uploadId,
+  partNumber,
+  key,
+  start,
+  end
+) {
+  let data = fs.createReadStream(filePath, {
+    start: start,
+    end: end,
+  });
+
+  const region = "auto";
+  const service = "s3";
+  const method = "PUT";
+  let da = [];
+  var payloadHash = "";
+  await pipeline(data, async (source) => {
+    for await (const chunk of source) {
+      da.push(chunk);
+    }
+  });
+
   const buff = Buffer.concat(da);
-  const word = crypto.lib.WordArray.create(buff);
-  const hash = crypto.SHA256(word).toString(crypto.enc.Hex);
+  const hash = crypt.createHash("sha256").update(buff).digest("hex");
+
   payloadHash = hash;
   const currentDate = new Date();
 
@@ -35,8 +46,8 @@ data.on("end", async () => {
       .substr(0, 15) + "Z";
   const dateStamp = amzDate.substr(0, 8);
 
-  const canonicalUri = `/thunder-streams/s.rar`;
-  const q = `partNumber=2&uploadId=${uploadid}`;
+  const canonicalUri = `/${bucket}/${key}`;
+  const q = `partNumber=${partNumber}&uploadId=${uploadId}`;
   const canonicalHeaders = `host:${host}\nx-amz-content-sha256:${hash}\nx-amz-date:${amzDate}\n`;
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
   const canonicalRequest = `${method}\n${canonicalUri}\n${q}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`;
@@ -63,13 +74,13 @@ data.on("end", async () => {
     .toString(crypto.enc.Hex);
 
   const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
-  let dat = fs.createReadStream("s.rar", {
-    start: 100000001,
-    end: 200000000,
+  let dat = fs.createReadStream(filePath, {
+    start: start,
+    end: end,
   });
   let config = {
     method: "PUT",
-    url: `${process.env.CLOUDFLARE_R2_ACCOUNT_ID}/thunder-streams/s.rar?partNumber=2&uploadId=${uploadid}`,
+    url: `${accountId}/${bucket}/${key}?partNumber=${partNumber}&uploadId=${uploadId}`,
     headers: {
       Authorization: authorizationHeader,
       Host: host,
@@ -82,13 +93,15 @@ data.on("end", async () => {
     data: dat,
   };
 
-  await axios
+  var res = await axios
     .request(config)
     .then((response) => {
-      console.log(response.headers);
+      console.log(response);
+      return response;
     })
     .catch((error) => {
       console.log(error);
     });
-});
+  return res;
+}
 module.exports = upload;
