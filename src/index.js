@@ -1,6 +1,6 @@
-const GetObject = require("./GetObject");
-const UploadData = require("./uploadRequest");
-const DeleteObject = require("./DeleteObject");
+const GetObject = require("./Get-Data/main.js");
+const UploadData = require("./Upload-Data/main.js");
+const DeleteObject = require("./Delete-data/main.js");
 class CloudflareR2 {
   constructor({ accessKeyId, secretAccessKey, bucket, accountId, host }) {
     this.bucket = bucket;
