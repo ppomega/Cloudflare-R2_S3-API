@@ -54,7 +54,7 @@ async function completeUpload(
 
   let config = {
     method: "POST",
-    url: `${accountId}/${bucket}/${key}?uploadId=${uploadId}`,
+    url: `https://${host}/${bucket}/${key}?uploadId=${uploadId}`,
     headers: {
       Authorization: authorizationHeader,
       Host: host,

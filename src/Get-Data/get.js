@@ -55,7 +55,7 @@ async function Chunk(
   let config = {
     responseType: "stream",
     method: "get",
-    url: `${accountId}/${bucket}/${path}`,
+    url: `https://${host}/${bucket}/${path}`,
     headers: {
       Authorization: authorizationHeader,
       "x-amz-date": amzDate,

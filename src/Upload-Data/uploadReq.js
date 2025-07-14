@@ -53,7 +53,7 @@ async function uploadReq(
 
   let config = {
     method: "post",
-    url: `${accountId}/${bucket}/${key}?uploads`,
+    url: `https://${host}/${bucket}/${key}?uploads`,
     headers: {
       Authorization: authorizationHeader,
       "x-amz-date": amzDate,

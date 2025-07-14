@@ -56,7 +56,7 @@ async function List(
   const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
   let config = {
     method: "GET",
-    url: `${accountId}/${bucket}/?prefix=${prefix}`,
+    url: `https://${host}/${bucket}/?prefix=${prefix}`,
     headers: {
       Authorization: authorizationHeader,
       Host: host,

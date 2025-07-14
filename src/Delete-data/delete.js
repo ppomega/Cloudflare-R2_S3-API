@@ -9,14 +9,7 @@ const amzDate =
     .replace(/[:-]|\.\d{3}/g, "")
     .substr(0, 15) + "Z";
 const dateStamp = amzDate.substr(0, 8);
-async function Delete(
-  bucket,
-  accessKeyId,
-  secretAccessKey,
-  host,
-  accountId,
-  filename
-) {
+async function Delete(bucket, accessKeyId, secretAccessKey, host, filename) {
   const canonicalUri = `/${bucket}/${filename}\n`;
   const canonicalHeaders = `host:${host}\nx-amz-content-sha256:UNSIGNED-PAYLOAD\nx-amz-date:${amzDate}\n`;
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
@@ -52,7 +45,7 @@ async function Delete(
   let config = {
     method: "delete",
     maxBodyLength: Infinity,
-    url: `${accountId}/${bucket}/${filename}`,
+    url: `https://${host}/${bucket}/${filename}`,
     headers: {
       Authorization: authorizationHeader,
       "x-amz-date": amzDate,

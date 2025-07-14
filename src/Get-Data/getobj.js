@@ -49,7 +49,7 @@ async function Getobj(
   const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
   let config = {
     method: "GET",
-    url: `${accountId}/${bucket}/${path}`,
+    url: `https://${host}/${bucket}/${path}`,
     headers: {
       Authorization: authorizationHeader,
       Host: host,

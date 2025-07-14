@@ -80,7 +80,7 @@ async function upload(
   });
   let config = {
     method: "PUT",
-    url: `${accountId}/${bucket}/${key}?partNumber=${partNumber}&uploadId=${uploadId}`,
+    url: `https://${host}/${bucket}/${key}?partNumber=${partNumber}&uploadId=${uploadId}`,
     headers: {
       Authorization: authorizationHeader,
       Host: host,

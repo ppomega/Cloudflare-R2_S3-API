@@ -56,7 +56,7 @@ async function uploadSmallFile(
 
   let config = {
     method: "put",
-    url: `${accountId}/${bucket}/${key}`,
+    url: `https://${host}/${bucket}/${key}`,
     headers: {
       Authorization: authorizationHeader,
       "x-amz-date": amzDate,
