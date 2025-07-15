@@ -66,9 +66,9 @@ async function Chunk(
       "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
     },
   };
-  const h = await axios.request(config);
+  const res = await axios.request(config);
 
-  return h;
+  return res;
 }
 
 module.exports = Chunk;

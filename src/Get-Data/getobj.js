@@ -60,7 +60,7 @@ async function Getobj(
     responseType: "stream",
   };
   try {
-    res = await axios.request(config);
+    const res = await axios.request(config);
     return res;
   } catch (e) {
     return e;

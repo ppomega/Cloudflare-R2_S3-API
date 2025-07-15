@@ -65,7 +65,7 @@ async function List(
     },
   };
   try {
-    res = await axios.request(config);
+    const res = await axios.request(config);
     let jObj = parser.parse(res.data);
 
     return jObj.ListBucketResult;
