@@ -46,7 +46,7 @@ async function upload(
       .substr(0, 15) + "Z";
   const dateStamp = amzDate.substr(0, 8);
 
-  const canonicalUri = `/${bucket}/${key}`;
+  const canonicalUri = `/${bucket}/${encodeURI(key)}`;
   const q = `partNumber=${partNumber}&uploadId=${uploadId}`;
   const canonicalHeaders = `host:${host}\nx-amz-content-sha256:${hash}\nx-amz-date:${amzDate}\n`;
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";

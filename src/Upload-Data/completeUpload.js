@@ -23,7 +23,7 @@ async function completeUpload(
   const dateStamp = amzDate.substr(0, 8);
   const payloadHash = "UNSIGNED-PAYLOAD";
   console.log(body);
-  const canonicalUri = `/${bucket}/${key}`;
+  const canonicalUri = `/${bucket}/${encodeURI(key)}`;
   const q = `uploadId=${uploadId}`;
   const canonicalHeaders = `host:${host}\nx-amz-content-sha256:UNSIGNED-PAYLOAD\nx-amz-date:${amzDate}\n`;
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";

@@ -20,7 +20,7 @@ async function Getobj(
       .substr(0, 15) + "Z";
   const dateStamp = amzDate.substr(0, 8);
 
-  const canonicalUri = `/${bucket}/${path}\n`;
+  const canonicalUri = `/${bucket}/${encodeURI(path)}\n`;
   const canonicalHeaders = `host:${host}\nx-amz-content-sha256:UNSIGNED-PAYLOAD\nx-amz-date:${amzDate}\n`;
   const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
   const canonicalRequest = `${method}\n${canonicalUri}\n${canonicalHeaders}\n${signedHeaders}\nUNSIGNED-PAYLOAD`;
