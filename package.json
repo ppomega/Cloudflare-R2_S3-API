@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-r2-s3",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "This is module is designed to interact with the Cloudflare R2 Object Storage which uses the R2-S3 API underhood",
   "main": "./src/index.js",
   "scripts": {
